@@ -7,9 +7,9 @@
 #include <mutex>
 #include <string>
 
-#include "Socket_Set.h"
-#include "sock_incl.h"
-#include "tcpSocket.h"
+#include "../Socket/Socket_Set.h"
+#include "../Socket/SocketIncludes.h"
+#include "../Socket/TCPSocket.h"
 
 
 namespace http {

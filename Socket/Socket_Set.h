@@ -10,7 +10,7 @@
 #include <sys/poll.h>
 #include <string.h>
 
-#include "tcpSocket.h"
+#include "TCPSocket.h"
 
 
 namespace http {

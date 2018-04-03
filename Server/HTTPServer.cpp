@@ -1,5 +1,5 @@
 #include "HTTPServer.h"
-#include "HTTPMessage.h"
+#include "../Message/HTTPMessage.h"
 
 #include <dirent.h>
 #include <fstream>

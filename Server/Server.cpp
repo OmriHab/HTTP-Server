@@ -7,12 +7,10 @@
 #include <termios.h>
 #include <thread>
 
-#include "server.h"
+#include "Server.h"
 
 
 using namespace http;
-
-#define EVER ;;
 
 server::server(int port, int max_connections, bool verbose)
 	: MainSocket(port)

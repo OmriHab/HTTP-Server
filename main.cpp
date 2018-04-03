@@ -3,10 +3,9 @@
 #include <map>
 #include <string.h>
 
-#include "server.h"
-#include "sock_incl.h"
-#include "HTTPMessage.h"
-#include "HTTPServer.h"
+#include "Socket/SocketIncludes.h"
+#include "Message/HTTPMessage.h"
+#include "Server/HTTPServer.h"
 
 
 int main(int argc, char* argv[]) {

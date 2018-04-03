@@ -1,8 +1,8 @@
 #include <iostream>
 #include <string.h>
 
-#include "tcpSocket.h"
-#include "sock_incl.h"
+#include "TCPSocket.h"
+#include "SocketIncludes.h"
 
 
 using namespace http;
