@@ -1,0 +1,13 @@
+<html>
+  <body>
+    <?chc
+      #include <iostream>
+      std::cout << "Hello world!";
+    ?>
+	<br>
+	<?chc
+	  #include <iostream>
+	  std::cout << "Hello again" << std::endl;
+	?>
+  </body>
+</html>
