@@ -1,0 +1,13 @@
+<html>
+  <body>
+    <?chc
+      for (int i = 1; i <= 50; i++) {
+	    cout << i << ": Hello world!<br>";
+	  }
+    ?>
+	<br>
+	<?chc
+	  cout << "Hello again" << endl;
+	?>
+  </body>
+</html>

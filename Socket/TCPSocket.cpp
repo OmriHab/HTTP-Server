@@ -80,12 +80,14 @@ int tcpSocket::Send(const std::string& msg) const {
 		
 		// On send malfunction return how much was sent until now
 		if (bytes_sent == -1) {
-			msg.length() - left_to_send;
+			return msg.length() - left_to_send;
 		}
 
 		left_to_send -= bytes_sent;
 		msg_to_send   = msg_to_send.substr(bytes_sent);
 	}
+
+	return msg.length();
 }
 
 int tcpSocket::Recv(std::string& msg, int length) const {
@@ -133,7 +135,7 @@ bool tcpSocket::Connect(const std::string& host, const std::string& port) {
 	hints.ai_socktype = SOCK_STREAM;	// Use TCP
 	hints.ai_flags    = AI_PASSIVE;		// Enter my ip address
 
-	int rv;
+	int rv = 0;
 
 	if ((rv = getaddrinfo(host.c_str(), port.c_str(), &hints, &results)) != 0) {
 		throw std::runtime_error("tcpSocket::Connect(host,port): getaddrinfo error, " + std::string(strerror(rv)));
@@ -154,6 +156,8 @@ bool tcpSocket::Connect(const std::string& host, const std::string& port) {
 	if (pResults == nullptr) {
 		throw std::runtime_error("tcpSocket::Connect(host,port): Unable to connect to " + host + ":" + port);
 	}
+
+	return true;
 }
 
 bool tcpSocket::EnableKeepAlive() {

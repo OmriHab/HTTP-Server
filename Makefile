@@ -1,4 +1,4 @@
-GPP_FLAGS    = -std=c++11 -g
+GPP_FLAGS    = -std=c++11 -g -Wall
 OBJECT_LIST  = main.o Server.o Socket.o TCPSocket.o HTTPServer.o HTTPMessage.o
 HEADER_FILES = Soket/Socket_Set.h
 THREAD_LIB   = -lpthread

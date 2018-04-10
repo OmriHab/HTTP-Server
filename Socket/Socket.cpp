@@ -11,7 +11,6 @@ using namespace http;
 Socket::Socket(int port, Type protocol, IPv ip_version) {
 	/*--Vars--*/
 	struct addrinfo hints, *results, *pResults;
-	socklen_t addr_size;
 	static const int MAX_PORT = 65535;
 
 	/* Check for legal port number */

@@ -21,7 +21,7 @@ public:
 	virtual void HandleMessage(const std::string& msg, const tcpSocket& socket);
 	
 private:
-	std::string MakeMessage(const std::map<std::string, std::string>& http_request);
+	std::string MakeMessage(const StringMap& http_request, const StringMap& URLParams);
 
 	bool LegalPath(const std::string& path) const;
 	inline bool FileExists(const std::string& path, std::string& file_to_send) const;

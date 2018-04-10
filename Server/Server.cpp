@@ -13,11 +13,11 @@
 using namespace http;
 
 server::server(int port, int max_connections, bool verbose)
-	: MainSocket(port)
+	: verbose(verbose)
+	, continue_serving(true)
+	, MainSocket(port)
 	, max_connections(max_connections)
-	, verbose(verbose)
-	, master_set(Socket_Set<tcpSocket>::READ)
-	, continue_serving(true) { }
+	, master_set(Socket_Set<tcpSocket>::READ) { }
 
 server::~server() {
 	std::deque<tcpSocket> sockets = this->master_set.GetAllSockets();

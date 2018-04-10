@@ -10,8 +10,8 @@
 
 using namespace http;
 
-std::map<std::string, std::string> HTTPMessage::ParseHTTPRequest(const std::string& request) {
-	std::map<std::string, std::string> HTTPRequest;
+HTTPMessage::StringMap HTTPMessage::ParseHTTPRequest(const std::string& request) {
+	StringMap HTTPRequest;
 
 	std::string::const_iterator head = request.begin();
 	std::string::const_iterator tail = head;
@@ -54,7 +54,48 @@ std::map<std::string, std::string> HTTPMessage::ParseHTTPRequest(const std::stri
 	return HTTPRequest;
 }
 
-std::string HTTPMessage::BuildHTTPResponse(const std::string& HTTPVersion, const std::string& Code, const std::string& phrase, const std::map<std::string, std::string>& params, const std::string& body) {
+HTTPMessage::StringMap HTTPMessage::GetURLParams(const std::string& URL) {
+	StringMap URLParams;
+	size_t paramStart = 0;
+
+	paramStart = URL.find("?");
+	// If no params found
+	if (paramStart == std::string::npos) {
+		return URLParams;
+	}
+
+	std::string params = URL.substr(paramStart+1);
+	size_t name_start = 0;
+	size_t name_end   = paramStart;
+	
+	size_t val_start = 0;
+	size_t val_end   = 0;
+	
+	std::string param_name;
+	std::string param_val;
+
+	do {
+		name_start = name_end + 1;
+		name_end   = URL.find("=", name_start);
+		// On synthax error, return empty map
+		if (name_start == std::string::npos) {
+			return StringMap();
+		}
+
+		val_start = name_end + 1;
+		// If '&' not found, there are no more params
+		val_end = URL.find("&", val_start);
+
+		param_name = URL.substr(name_start, name_end-name_start);
+		// If val_end not found, it will be equeal to npos and param_val will be copied to end of the URL
+		param_val = URL.substr(val_start, val_end-val_start);
+		URLParams[param_name] = param_val;
+	} while ((val_end != std::string::npos));
+
+	return URLParams;
+}
+
+std::string HTTPMessage::BuildHTTPResponse(const std::string& HTTPVersion, const std::string& Code, const std::string& phrase, const StringMap& params, const std::string& body) {
 	std::string response;
 	// First line
 	response = HTTPVersion + " " + Code +  " " + phrase + "\r\n";
@@ -84,9 +125,9 @@ std::string HTTPMessage::BuildErrorBody(int ErrorCode, const std::string& ErrorM
 	return body;
 }
 
-std::string HTTPMessage::CHCIt(const std::string& chc_body) {
+std::string HTTPMessage::CHCIt(const std::string& chc_body, const StringMap& URLParams) {
 	// Find the chc tag
-	int chc_tag = chc_body.find("<?chc");
+	unsigned chc_tag = chc_body.find("<?chc");
 	int chc_end = -2;
 
 	std::string final_result;
@@ -100,7 +141,7 @@ std::string HTTPMessage::CHCIt(const std::string& chc_body) {
 
 		// Find the closing tag, starting from the opening tab
 		chc_end = chc_body.find("?>", chc_tag);
-		if (chc_end == std::string::npos) {
+		if (chc_end == static_cast<int>(std::string::npos)) {
 			// On bad chc section, set length as (body length)-2 so
 			// the chc section doesnt get copied to final_result
 			chc_end = chc_body.length()-2;
@@ -131,11 +172,14 @@ std::string HTTPMessage::CHCToCPP(const std::string& chc_code) {
 	* CHC code is like cpp code, just it doesnt need to have
 	* the main function in it, for simplicity of writing.
 	* This function wraps the CHC code in a main function.
+	* It also includes iostream and uses the namespace std.
+	* Rules: All includes must come first.
 	*/
 	std::string cpp_string;
 	bool before_hash = true;
 	std::string::const_iterator code_itter;
 
+	// All includes must come before int main(){ /* code */ }
 	for (code_itter = chc_code.begin(); code_itter != chc_code.end(); code_itter++) {
 		if (*code_itter == '#') {
 			before_hash = false;
@@ -149,9 +193,7 @@ std::string HTTPMessage::CHCToCPP(const std::string& chc_code) {
 		cpp_string.push_back(*code_itter);
 	}
 
-	return cpp_string + "int main(){ " + std::string(code_itter, chc_code.end()) + " }";
-
-
+	return cpp_string + "\n#include <iostream>\n" + "using namespace std;" + "int main(){ " + std::string(code_itter, chc_code.end()) + " }";
 }
 
 std::string HTTPMessage::RunIt(const std::string& chc_code) {
@@ -199,7 +241,7 @@ std::string HTTPMessage::RunIt(const std::string& chc_code) {
 
 std::string HTTPMessage::Success200(const std::string& body, const std::string& file_name) {
 	std::string response;
-	std::map<std::string, std::string> parameters;
+	StringMap parameters;
 
 	parameters["Date"]                = GetDate();
 	parameters["Content-Length"]      = std::to_string(body.length());
@@ -212,7 +254,7 @@ std::string HTTPMessage::Success200(const std::string& body, const std::string& 
 
 std::string HTTPMessage::Error400() {
 	std::string response;
-	std::map<std::string, std::string> parameters;
+	StringMap parameters;
 	
 	std::string body = HTTPMessage::BuildErrorBody(400, "Bad Synthax");
 
@@ -226,7 +268,7 @@ std::string HTTPMessage::Error400() {
 
 std::string HTTPMessage::Error403() {
 	std::string response;
-	std::map<std::string, std::string> parameters;
+	StringMap parameters;
 	
 	std::string body = HTTPMessage::BuildErrorBody(403, "Forbidden");
 
@@ -240,7 +282,7 @@ std::string HTTPMessage::Error403() {
 
 std::string HTTPMessage::Error404() {
 	std::string response;
-	std::map<std::string, std::string> parameters;
+	StringMap parameters;
 	
 	std::string body = HTTPMessage::BuildErrorBody(404, "Not Found");
 
@@ -254,7 +296,7 @@ std::string HTTPMessage::Error404() {
 
 std::string HTTPMessage::Error500() {
 	std::string response;
-	std::map<std::string, std::string> parameters;
+	StringMap parameters;
 	
 	std::string body = HTTPMessage::BuildErrorBody(500, "Internal Server Error");
 
@@ -269,7 +311,7 @@ std::string HTTPMessage::Error500() {
 std::string HTTPMessage::Error501() {
 
 	std::string response;
-	std::map<std::string, std::string> parameters;
+	StringMap parameters;
 	
 	std::string body = HTTPMessage::BuildErrorBody(501, "Not Implemented");
 
@@ -291,7 +333,7 @@ std::string HTTPMessage::GetDate() {
 }
 
 std::string HTTPMessage::GetContentType(const std::string& file_name) {
-	static const std::map<std::string, std::string> content_types = {
+	static const StringMap content_types = {
 		{"html", "text/html"}, {"htm", "text/html"},       {"css", "text/css"},
 		{"jpg", "image/jpeg"}, {"jpeg", "image/jpeg"},     {"png", "image/png"},
 		{"gif", "image/gif"},  {"mp4", "video/mp4"},       {"mpeg", "video/mpeg"},

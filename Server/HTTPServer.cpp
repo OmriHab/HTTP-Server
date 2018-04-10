@@ -36,15 +36,22 @@ HTTPServer::HTTPServer(int port, int max_connections, const std::string& home_pa
 }
 
 void HTTPServer::HandleMessage(const std::string& msg, const tcpSocket& socket) {
-	std::map<std::string, std::string> http_request = HTTPMessage::ParseHTTPRequest(msg);
+	StringMap http_request = HTTPMessage::ParseHTTPRequest(msg);
+	StringMap URLParams;
 	std::string HTTPResponse;
 
-	HTTPResponse = MakeMessage(http_request);
+	try {
+		URLParams    = HTTPMessage::GetURLParams(http_request["path"]);
+		HTTPResponse = MakeMessage(http_request, URLParams);
+	}
+	catch (const std::exception& e) {
+		ThreadSafeLog("Error responsing to socket " + std::to_string(socket.GetSockId()) + "\n" + e.what() + "\n", std::cerr);
+	}
 
 	socket.Send(HTTPResponse);
 }
 
-std::string HTTPServer::MakeMessage(const std::map<std::string, std::string>& http_request) {
+std::string HTTPServer::MakeMessage(const StringMap& http_request, const StringMap& URLParams) {
 	try {
 		std::string method = http_request.at("method");
 		std::string path   = http_request.at("path");
@@ -92,7 +99,7 @@ std::string HTTPServer::MakeMessage(const std::map<std::string, std::string>& ht
 
 			std::string extension = file_to_send.substr(file_to_send.find_last_of(".")+1);
 			if (extension == "chc") {
-				file_contents = HTTPMessage::CHCIt(file_contents);
+				file_contents = HTTPMessage::CHCIt(file_contents, URLParams);
 			}
 
 
@@ -155,7 +162,6 @@ std::string HTTPServer::TranslatePath(const std::string& path) {
 		// On special chars
 		else {
 			unsigned int hex_number;
-			char converted;
 			c++;
 			// Convert next number from hex to char
 			helper << std::hex << path.substr(std::distance(path.begin(), c), 2);

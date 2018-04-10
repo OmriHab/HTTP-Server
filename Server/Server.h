@@ -63,6 +63,7 @@ private:
 	std::mutex connections_lock;
 
 protected:
+	typedef std::map<std::string, std::string> StringMap;
 	/**
 	* Thread safe log, print if verbose is true.
 	* msg    - Message to write.

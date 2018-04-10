@@ -8,6 +8,7 @@ namespace http {
 
 class HTTPMessage {
 private:
+	typedef std::map<std::string, std::string> StringMap;
 	// Delete c'tor, d'tor and equals operator, class HTTPMessage is a static class
 	HTTPMessage() = delete;
 	~HTTPMessage() = delete;
@@ -17,10 +18,13 @@ private:
 	static std::string GetDate();
 
 public:
-	static std::string GetContentType(const std::string& file_name);
-	static std::map<std::string, std::string> ParseHTTPRequest(const std::string& request);
-	static std::string BuildHTTPResponse(const std::string& HTTPVersion, const std::string& Code, const std::string& phrase, const std::map<std::string, std::string>& params, const std::string& body);
+	static StringMap ParseHTTPRequest(const std::string& request);
+	static StringMap GetURLParams(const std::string& URL);
+	
+	static std::string BuildHTTPResponse(const std::string& HTTPVersion, const std::string& Code, const std::string& phrase, const StringMap& params, const std::string& body);
 	static std::string BuildErrorBody(int ErrorCode, const std::string& ErrorMessage);
+	
+	static std::string GetContentType(const std::string& file_name);
 
 	/* CHC functions, like php but in Cpp! */
 	/**
@@ -28,7 +32,7 @@ public:
 	* chc_body - CHC file text to make into an html file.
 	* Return value: Normal html file after CHC'ing it.
 	*/
-	static std::string CHCIt(const std::string& chc_body);
+	static std::string CHCIt(const std::string& chc_body, const StringMap& URLParams);
 
 private:
 	static std::string CHCToCPP(const std::string& chc_code);
