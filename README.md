@@ -12,7 +12,7 @@ Run the HTTP server by using `./httpServer <port> <base_path>`
 base_path supports relative paths.
 # Server functionality
 The server serves files from the base path given in the arguments and doesn't give files in a lower directory than that.  
-In case of error the server returns the appropiate error case with an explenation message containing the error code number.  
+In the case of an http error, the server sends an appropiate error html page with a message containing the error code number and error message.  
 ### CHC
 The server also supports CHC files.  
 A CHC file is an html file which might have CHC code inside it and ends with a .chc suffix.
@@ -23,4 +23,5 @@ CHC code is written in c++, with all includes on top, then the code.
 CHC code has `iostream` included built-in and `using namespace std` for easier use, as CHC is meant for small scripts and not big programs.  
 On fail to run file, or on an exception that cuts the program before finishing, nothing is printed in the CHC section.
 # TODO
-Add config file for server options e.g port, base path, supported file types and more
+Add config file for server options e.g port, base path, supported file types and more.  
+Add GET variables to CHC pages.
