@@ -78,6 +78,13 @@ protected:
 	void ThreadSafeLogPrintAlways(const std::string& msg, std::ostream& stream=std::cout);
 	Socket_Set<tcpSocket> master_set;
 
+	/**
+	* End connection with socket, removes it from connection
+	* lists and closes the socket.
+	* socket - Socket to close.
+	*/
+	void EndConnection(const tcpSocket& socket);
+
 public:
 	/**
 	* server C'tor

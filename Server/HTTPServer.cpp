@@ -49,6 +49,8 @@ void HTTPServer::HandleMessage(const std::string& msg, const tcpSocket& socket) 
 	}
 
 	socket.Send(HTTPResponse);
+	// End connection after responding
+	this->EndConnection(socket);
 }
 
 std::string HTTPServer::MakeMessage(const StringMap& http_request, const StringMap& URLParams) {

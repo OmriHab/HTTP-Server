@@ -66,9 +66,9 @@ bool server::SetUpServer() {
 
 void server::HandleConnections() {
 	std::string message_received;
-	// Maximum recv of 4 kilobytes
+	// Maximum recv of 8 kilobytes
 	static const int KILOBYTE     = 1024;
-	static const int MAX_MSG_SIZE = 4*KILOBYTE;
+	static const int MAX_MSG_SIZE = 8*KILOBYTE;
 
 	std::deque<tcpSocket> readable;
 	tcpSocket tmpSocket;
@@ -96,9 +96,9 @@ void server::HandleConnections() {
 			else {
 				try {
 					int ret_val = socket.Recv(message_received, MAX_MSG_SIZE);
-					// If receive failed, remove socket
+					// If receive failed, remove and close socket
 					if (ret_val <= 0) {
-						this->master_set.RemoveSocket(socket);
+						this->EndConnection(socket);
 					}
 					else {
 						HandleMessage(message_received, socket);
@@ -116,6 +116,11 @@ void server::HandleConnections() {
 void server::HandleMessage(const std::string& msg, const tcpSocket& sender) {
 	// Just print the message
 	ThreadSafeLog(msg + "\n\n");	
+}
+
+void server::EndConnection(const tcpSocket& socket) {
+	this->master_set.RemoveSocket(socket);
+	socket.Close();
 }
 
 void server::ThreadSafeLog(const std::string& msg, std::ostream& stream) {
